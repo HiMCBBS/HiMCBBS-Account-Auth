@@ -1,0 +1,5 @@
+# HiMCBBS Account Auth Config
+
+# Decides how to store the account auth
+# Available storage modes: json
+storage-mode: json

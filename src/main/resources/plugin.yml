@@ -1,0 +1,14 @@
+name: HiMCBBS Account Auth
+version: '0.1.1'
+main: com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth
+api-version: '1.18'
+prefix: HiMCBBS Account Auth
+authors: [ Terry_MC ]
+description: HiMCBBS Account Auth
+website: https://terry-mc.top/
+commands:
+  himcbbsaccountauth:
+    description: The main command of HiMCBBS Account Auth.
+    usage: /<command> reload
+    aliases: ["hiauth"]
+    permission: hiauth.use
