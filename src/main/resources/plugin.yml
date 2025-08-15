@@ -1,4 +1,4 @@
-name: HiMCBBS Account Auth
+name: HiMCBBS-Account-Auth
 version: '0.1.1'
 main: com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth
 api-version: '1.18'

@@ -3,6 +3,7 @@ package com.himcbbs.play.serverclient.himcbbsauth;
 import com.himcbbs.play.serverclient.himcbbsauth.command.MainCommand;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.Storage;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.StorageManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +21,13 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
         this.saveDefaultConfig();
         this.reloadConfig();
         this.getCommand("himcbbsaccountauth").setExecutor(new MainCommand());
-        StorageManager.getInstance().init();
+        try {
+            StorageManager.getInstance().init();
+        } catch (Exception e) {
+            error(e, "An error occurred while initializing storage!");
+            disable();
+            return;
+        }
         info("HiMCBBS Account Auth enabled.");
     }
 
@@ -30,15 +37,11 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
     }
 
     public void enable() {
-        if(!HiMCBBSAccountAuth.getInstance().isEnabled()) {
-            HiMCBBSAccountAuth.getInstance().getPluginLoader().enablePlugin(HiMCBBSAccountAuth.getInstance());
-        }
+        Bukkit.getPluginManager().enablePlugin(this);
     }
 
     public void disable() {
-        if(!HiMCBBSAccountAuth.getInstance().isEnabled()) {
-            HiMCBBSAccountAuth.getInstance().getPluginLoader().disablePlugin(HiMCBBSAccountAuth.getInstance());
-        }
+        Bukkit.getPluginManager().disablePlugin(this);
     }
 
     @NotNull

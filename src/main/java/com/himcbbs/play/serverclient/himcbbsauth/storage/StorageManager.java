@@ -7,26 +7,21 @@ import java.util.ServiceLoader;
 public class StorageManager {
     private Storage runningStorage;
     private static StorageManager INSTANCE;
-    public void init() {
+    public void init() throws Exception {
         ServiceLoader<Storage> storages = ServiceLoader.load(Storage.class);
         String storageMode = HiMCBBSAccountAuth.getInstance().getConfig().getString("storage-mode");
         //TODO: make a way to migrate storage mode
         for(Storage storage:storages) {
+            HiMCBBSAccountAuth.getInstance().info(storage.id());
             if(storage.id().equals(storageMode)) {
                 runningStorage=storage;
                 break;
             }
         }
         if(runningStorage==null) {
-            HiMCBBSAccountAuth.getInstance().info("Invalid storage mode!");
-            HiMCBBSAccountAuth.getInstance().disable();
+            throw new RuntimeException("Invalid storage mode '"+storageMode+"'");
         }
-        try {
-            runningStorage.init();
-        } catch (Exception e) {
-            HiMCBBSAccountAuth.getInstance().error(e, "An error occurred while initializing storage '{}'!", storageMode);
-            HiMCBBSAccountAuth.getInstance().disable();
-        }
+        runningStorage.init();
     }
     public static StorageManager getInstance() {
         if(INSTANCE == null) {
