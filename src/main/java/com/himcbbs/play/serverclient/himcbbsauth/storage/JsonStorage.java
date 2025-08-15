@@ -53,4 +53,7 @@ public class JsonStorage implements Storage {
     public String id() {
         return "json";
     }
+
+    public JsonStorage() {
+    }
 }

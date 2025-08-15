@@ -9,10 +9,10 @@ public class StorageManager {
     private static StorageManager INSTANCE;
     public void init() throws Exception {
         ServiceLoader<Storage> storages = ServiceLoader.load(Storage.class);
+        //TODO: fix the broken SPI
         String storageMode = HiMCBBSAccountAuth.getInstance().getConfig().getString("storage-mode");
         //TODO: make a way to migrate storage mode
         for(Storage storage:storages) {
-            HiMCBBSAccountAuth.getInstance().info(storage.id());
             if(storage.id().equals(storageMode)) {
                 runningStorage=storage;
                 break;
