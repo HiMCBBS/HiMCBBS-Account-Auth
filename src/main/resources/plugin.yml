@@ -9,6 +9,7 @@ website: https://terry-mc.top/
 commands:
   himcbbsaccountauth:
     description: The main command of HiMCBBS Account Auth.
-    usage: /<command> reload
+    usage: "/<command> reload - 重载插件配置
+/<command> bind - 绑定HiMCBBS账号"
     aliases: ["hiauth"]
     permission: hiauth.use

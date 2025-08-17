@@ -1,14 +1,16 @@
 package com.himcbbs.play.serverclient.himcbbsauth.network;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.util.Map;
 
 public class NetworkManager {
-    private static final MediaType JSON = MediaType.get("application/json");
-    private static final String API_TEST = "cn-js-01-bgp-c7k5s6d9.wxmc.top:3625";
+    private static final MediaType FORM = MediaType.get("application/x-www-form-urlencoded");
+    public static final String API_TEST_HOST = "cn-js-01-bgp-c7k5s6d9.wxmc.top";
+    public static final int API_TEST_PORT = 3625;
     private final OkHttpClient httpClient;
     private final Gson gson;
     private static NetworkManager INSTANCE;
@@ -18,15 +20,22 @@ public class NetworkManager {
         gson = new Gson();
     }
 
-    public Object getObjectByResponse(Response response, Type type) throws IOException {
-        return gson.fromJson(response.body().string(), type);
+    public <T> T getObjectByResponse(Response response, TypeToken<?> typeToken) throws IOException {
+        T res;
+        if(response.body()==null) {
+            res = null;
+        } else {
+            res = gson.fromJson(response.body().string(), typeToken.getType());
+        }
+        return res;
     }
 
-    public Response POST(String pathSegments, String body) throws IOException {
-        RequestBody requestBody = RequestBody.create("{}", JSON);
-        if(body!=null) {
-            requestBody = RequestBody.create(body, JSON);
+    public Response POST(String pathSegments, Map<String, String> formBody) throws IOException {
+        FormBody.Builder builder = new FormBody.Builder();
+        for(Map.Entry<String, String> entry:formBody.entrySet()) {
+            builder.add(entry.getKey(),entry.getValue());
         }
+        RequestBody requestBody = builder.build();
         Request request = new Request.Builder()
                 .addHeader("Accept", "application/json")
                 .url(getApiUrl(pathSegments))
@@ -40,7 +49,8 @@ public class NetworkManager {
     private HttpUrl getApiUrl(String pathSegments) {
         return new HttpUrl.Builder()
                 .scheme("http")
-                .host(API_TEST)
+                .host(API_TEST_HOST)
+                .port(API_TEST_PORT)
                 .addPathSegments(pathSegments)
                 .build();
     }

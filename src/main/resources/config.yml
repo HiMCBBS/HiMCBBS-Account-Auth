@@ -1,5 +1,15 @@
-# HiMCBBS Account Auth Config
+# HiMCBBS Account Auth 配置文件
 
-# Decides how to store the account auth
-# Available storage modes: json
+# 存储配置
+
+# 此项决定如何存储玩家数据
+# 可用的存储选项：json
 storage-mode: json
+
+# HiMCBBS接入配置
+
+# 服务器的server_id（可从HiMCBBS相关服务获取）
+server-id: -1
+
+# 服务器的client_secret（可从HiMCBBS相关服务获取）
+client-secret: null

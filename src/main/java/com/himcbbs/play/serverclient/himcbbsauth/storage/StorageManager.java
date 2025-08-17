@@ -19,7 +19,7 @@ public class StorageManager {
             }
         }
         if(runningStorage==null) {
-            throw new RuntimeException("Invalid storage mode '"+storageMode+"'");
+            throw new RuntimeException("错误的存储配置：“"+storageMode+"”");
         }
         runningStorage.init();
     }
@@ -28,5 +28,8 @@ public class StorageManager {
             INSTANCE = new StorageManager();
         }
         return INSTANCE;
+    }
+    public Storage getRunningStorage() {
+        return runningStorage;
     }
 }

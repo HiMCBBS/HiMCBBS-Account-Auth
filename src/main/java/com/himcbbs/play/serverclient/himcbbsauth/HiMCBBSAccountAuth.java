@@ -1,12 +1,14 @@
 package com.himcbbs.play.serverclient.himcbbsauth;
 
 import com.himcbbs.play.serverclient.himcbbsauth.command.MainCommand;
+import com.himcbbs.play.serverclient.himcbbsauth.listener.PlayerListener;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.Storage;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.StorageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,22 +20,29 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
     @Override
     public void onEnable() {
         INSTANCE = this;
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         this.saveDefaultConfig();
         this.reloadConfig();
-        this.getCommand("himcbbsaccountauth").setExecutor(new MainCommand());
         try {
-            StorageManager.getInstance().init();
-        } catch (Exception e) {
-            error(e, "An error occurred while initializing storage!");
+            this.getCommand("himcbbsaccountauth").setExecutor(new MainCommand());
+        } catch (RuntimeException | IOException e) {
+            error(e, "当初始化HiMCBBS接入配置时出现问题！");
             disable();
             return;
         }
-        info("HiMCBBS Account Auth enabled.");
+        try {
+            StorageManager.getInstance().init();
+        } catch (Exception e) {
+            error(e, "当初始化存储配置时出现问题！");
+            disable();
+            return;
+        }
+        info("HiMCBBS Account Auth 已启用");
     }
 
     @Override
     public void onDisable() {
-        info("HiMCBBS Account Auth disabled.");
+        info("HiMCBBS Account Auth 已禁用");
     }
 
     public void enable() {
