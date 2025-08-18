@@ -1,5 +1,6 @@
 package com.himcbbs.play.serverclient.himcbbsauth.command;
 
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth;
 import com.himcbbs.play.serverclient.himcbbsauth.network.JsonBaseResponse;
@@ -40,10 +41,11 @@ public class MainCommand implements CommandExecutor {
             throw new RuntimeException("server_id或client_secret未配置！请在配置文件中HiMCBBS接入模块中配置相应值！");
         }
         NetworkManager manager = NetworkManager.getInstance();
-        Response response = manager.POST("/mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null));
-        if(!response.isSuccessful()) {
-            JsonBaseResponse<JsonState> state = getState(response);
-            throw new RuntimeException("server_id或client_secret的配置值不正确！状态码："+state.status+" 消息："+state.message);
+        try (Response response = manager.POST("mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null))) {
+            if(!response.isSuccessful()) {
+                JsonBaseResponse<JsonState> state = getState(response);
+                throw new RuntimeException("server_id或client_secret的配置值不正确！状态码："+state.status+" 消息："+state.message);
+            }
         }
     }
     @Override
@@ -69,8 +71,7 @@ public class MainCommand implements CommandExecutor {
                 if(stateMap.get(player.getUniqueId())!=null) {
                     Map.Entry<Long, JsonState> entry = stateMap.get(player.getUniqueId());
                     if(entry.getKey()+entry.getValue().expires_in<=Instant.now().getEpochSecond()) {
-                        try {
-                            Response response = manager.POST("/mcserver_client/getMCServerOAuthResult", getRequestBody(entry.getValue().state));
+                        try (Response response = manager.POST("mcserver_client/getMCServerOAuthResult", getRequestBody(entry.getValue().state))) {
                             JsonBaseResponse<JsonUser> user = manager.getObjectByResponse(response, new TypeToken<JsonBaseResponse<JsonUser>>(){});
                             if(!response.isSuccessful()) {
                                 throw new RuntimeException("授权失败！状态码："+user.status+" 消息："+user.message);
@@ -86,8 +87,7 @@ public class MainCommand implements CommandExecutor {
                     stateMap.remove(player.getUniqueId());
                     player.sendMessage(ChatColor.RED+"之前的会话已过期，正在重新请求...");
                 }
-                try {
-                    Response response = manager.POST("/mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null));
+                try (Response response = manager.POST("mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null))) {
                     JsonBaseResponse<JsonState> state = getState(response);
                     if(!response.isSuccessful()) {
                         throw new RuntimeException("请求出错！状态码："+state.status+" 消息："+state.message);
@@ -128,7 +128,7 @@ public class MainCommand implements CommandExecutor {
         return false;
     }
 
-    private JsonBaseResponse<JsonState> getState(Response response) throws IOException {
+    private JsonBaseResponse<JsonState> getState(Response response) throws IOException, JsonParseException {
         return NetworkManager.getInstance().getObjectByResponse(response, new TypeToken<JsonBaseResponse<JsonState>>(){});
     }
 

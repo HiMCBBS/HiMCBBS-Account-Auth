@@ -1,7 +1,10 @@
 package com.himcbbs.play.serverclient.himcbbsauth.network;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -20,7 +23,7 @@ public class NetworkManager {
         gson = new Gson();
     }
 
-    public <T> T getObjectByResponse(Response response, TypeToken<?> typeToken) throws IOException {
+    public <T> T getObjectByResponse(Response response, TypeToken<?> typeToken) throws IOException, JsonParseException {
         T res;
         if(response.body()==null) {
             res = null;
@@ -41,9 +44,7 @@ public class NetworkManager {
                 .url(getApiUrl(pathSegments))
                 .post(requestBody)
                 .build();
-        try(Response response = httpClient.newCall(request).execute()) {
-            return response;
-        }
+        return httpClient.newCall(request).execute();
     }
 
     private HttpUrl getApiUrl(String pathSegments) {
