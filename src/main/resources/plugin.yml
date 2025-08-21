@@ -2,6 +2,7 @@ name: HiMCBBS-Account-Auth
 version: '0.1.1'
 main: com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth
 api-version: '1.18'
+folia-supported: true
 prefix: HiMCBBS Account Auth
 authors: [ Terry_MC ]
 description: HiMCBBS Account Auth

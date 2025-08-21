@@ -6,21 +6,39 @@ import com.himcbbs.play.serverclient.himcbbsauth.listener.RegisterListener;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.Storage;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.StorageManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class HiMCBBSAccountAuth extends JavaPlugin {
-    public final Logger LOGGER = getLogger();
     private static HiMCBBSAccountAuth INSTANCE;
+    public final Logger LOGGER = getLogger();
+    // folia start
+    /** GlobalRegionScheduler getGlobalRegionScheduler(); */
+    public Method getGlobalRegionScheduler = null;
+    /** ScheduledTask runDelayed(Plugin plugin, Consumer<ScheduledTask> task, long delayTicks); */
+    public Method runDelayed = null;
+    public boolean foliaSuppported = false;
+    //folia end
 
     @Override
     public void onEnable() {
         INSTANCE = this;
+        try {
+            Class<?> clazz = Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+            getGlobalRegionScheduler = Server.class.getMethod("getGlobalRegionScheduler");
+            runDelayed = clazz.getMethod("runDelayed", Plugin.class, Consumer.class, long.class);
+            foliaSuppported = true;
+        } catch (NoSuchMethodException | ClassNotFoundException ignored) {
+        }
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new RegisterListener(), this);
         saveDefaultConfig();

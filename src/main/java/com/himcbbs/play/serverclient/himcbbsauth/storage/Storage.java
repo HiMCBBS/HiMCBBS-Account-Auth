@@ -12,6 +12,7 @@ public interface Storage {
      * Get the user_id by player {@link UUID}.
      * @return the user_id of the player
      * @throws Exception if there is something wrong while getting user_id
+     * @implNote if the {@link UUID} does not exist, return null.
      */
     @Nullable
     String getUserId(UUID uuid) throws Exception;

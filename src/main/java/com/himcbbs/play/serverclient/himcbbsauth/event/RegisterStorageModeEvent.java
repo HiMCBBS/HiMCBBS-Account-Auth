@@ -3,8 +3,9 @@ package com.himcbbs.play.serverclient.himcbbsauth.event;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.Storage;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.util.Consumer;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 public class RegisterStorageModeEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

@@ -16,6 +16,7 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 import okhttp3.Response;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainCommand implements CommandExecutor, TabCompleter {
     private final int serverId;
@@ -51,7 +53,6 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     }
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(withoutPermission(sender, "hiauth.use")) return false;
         HiMCBBSAccountAuth plugin = HiMCBBSAccountAuth.getInstance();
         if(args.length==1) {
             if (args[0].equals("reload")) {
@@ -65,10 +66,17 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                 if(withoutPermission(sender, "hiauth.bind")) return false;
                 if(!(sender instanceof Player)) {
                     sender.sendMessage(ChatColor.RED+"该命令无法在控制台中使用！");
-                    return false;
+                    return true;
                 }
                 Player player = (Player) sender;
                 NetworkManager manager = NetworkManager.getInstance();
+                try {
+                    if(StorageManager.getInstance().getRunningStorage().getUserId(player.getUniqueId())!=null) {
+                        sender.sendMessage("你已经绑定过HiMCBBS账号了！");
+                        return true;
+                    }
+                } catch (Exception ignored) {
+                }
                 if(stateMap.get(player.getUniqueId())!=null) {
                     Map.Entry<Long, JsonState> entry = stateMap.get(player.getUniqueId());
                     if(entry.getKey()+entry.getValue().expires_in>=Instant.now().getEpochSecond()) {
@@ -79,6 +87,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                             }
                             StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), String.valueOf(user.data.user_id));
                             player.sendMessage(ChatColor.GREEN+"绑定成功！");
+                            stateMap.remove(player.getUniqueId());
                             //TODO: force register/login player in the login plugin
                             return true;
                         } catch (Exception e) {
@@ -122,20 +131,20 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         }
         if(args.length==2) {
             if(args[0].equals("unbind")) {
-                if(withoutPermission(sender, "hiauth.unbind")) return false;
-                Player player = Bukkit.getServer().getPlayerExact(args[1]);
-                if(player!=null) {
+                if(withoutPermission(sender, "hiauth.unbind")) return true;
+                OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);
+                if(player.hasPlayedBefore()) {
                     try {
                         StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), null);
-                        return true;
+                        sender.sendMessage(ChatColor.GREEN+"解绑成功！");
                     } catch (Exception e) {
                         sender.sendMessage(ChatColor.RED+"尝试给%s解绑玩家账号时出现错误！", player.getName());
                         plugin.error(e, "尝试给%s解绑玩家账号时出现错误！", player.getName());
-                        return false;
                     }
+                    return true;
                 }
-                sender.sendMessage("无法找到玩家%s！", args[1]);
-                return false;
+                sender.sendMessage(ChatColor.RED+"无法找到玩家"+args[1]+"！");
+                return true;
             }
         }
         sender.sendMessage(ChatColor.RED+"命令格式错误！");
@@ -168,7 +177,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         List<String> res = new ArrayList<>();
-        if(args.length == 1 && sender.hasPermission("hiauth.use")) {
+        if(args.length == 1) {
             if(sender.hasPermission("hiauth.reload")) {
                 res.add("reload");
             }
@@ -178,6 +187,9 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             if(sender.hasPermission("hiauth.unbind")) {
                 res.add("unbind");
             }
+        }
+        if(args.length == 2 && sender.hasPermission("hiauth.unbind") && args[0].equals("unbind")) {
+            return Arrays.stream(sender.getServer().getOfflinePlayers()).map((OfflinePlayer::getName)).collect(Collectors.toList());
         }
         return res;
     }
