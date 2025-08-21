@@ -54,12 +54,13 @@ public class PlayerListener implements Listener {
                     }
                     return method.invoke(proxy, args);
                 }));
-                plugin.runDelayed.invoke(scheduler, plugin, consumer, 10);
+                plugin.runDelayed.invoke(scheduler, plugin, consumer, 20);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
             return;
         }
-        player.getServer().getScheduler().runTaskLater(plugin, runnable, 10);
+        player.getServer().getScheduler().runTaskLater(plugin, runnable, 20);
+        // delay 20 ticks for auth plugins and FastLogin
     }
 }
