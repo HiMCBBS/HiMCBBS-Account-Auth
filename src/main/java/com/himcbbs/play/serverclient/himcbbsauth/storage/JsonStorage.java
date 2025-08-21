@@ -27,7 +27,11 @@ public class JsonStorage implements Storage {
 
     @Override
     public void setUserId(UUID uuid, String userId) throws Exception {
-        map.put(uuid.toString(), userId);
+        if(userId == null) {
+            map.remove(uuid.toString());
+        } else {
+            map.put(uuid.toString(), userId);
+        }
         try(FileOutputStream os = new FileOutputStream(storageFile)) {
             os.write(gson.toJson(map, new TypeToken<Map<String,String>>(){}.getType()).getBytes(StandardCharsets.UTF_8));
         }

@@ -14,20 +14,21 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import okhttp3.Response;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class MainCommand implements CommandExecutor {
+public class MainCommand implements CommandExecutor, TabCompleter {
     private final int serverId;
     private final String clientSecret;
     private final Map<UUID, Map.Entry<Long, JsonState>> stateMap;
@@ -70,7 +71,7 @@ public class MainCommand implements CommandExecutor {
                 NetworkManager manager = NetworkManager.getInstance();
                 if(stateMap.get(player.getUniqueId())!=null) {
                     Map.Entry<Long, JsonState> entry = stateMap.get(player.getUniqueId());
-                    if(entry.getKey()+entry.getValue().expires_in<=Instant.now().getEpochSecond()) {
+                    if(entry.getKey()+entry.getValue().expires_in>=Instant.now().getEpochSecond()) {
                         try (Response response = manager.POST("mcserver_client/getMCServerOAuthResult", getRequestBody(entry.getValue().state))) {
                             JsonBaseResponse<JsonUser> user = manager.getObjectByResponse(response, new TypeToken<JsonBaseResponse<JsonUser>>(){});
                             if(!response.isSuccessful()) {
@@ -79,13 +80,16 @@ public class MainCommand implements CommandExecutor {
                             StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), String.valueOf(user.data.user_id));
                             player.sendMessage(ChatColor.GREEN+"绑定成功！");
                             //TODO: force register/login player in the login plugin
+                            return true;
                         } catch (Exception e) {
                             player.sendMessage(ChatColor.RED+"绑定账号时出现错误，正在重新请求...");
                             plugin.error(e, "尝试给%s绑定玩家账号时出现错误！", player.getName());
                         }
                     }
-                    stateMap.remove(player.getUniqueId());
-                    player.sendMessage(ChatColor.RED+"之前的会话已过期，正在重新请求...");
+                    else {
+                        stateMap.remove(player.getUniqueId());
+                        player.sendMessage(ChatColor.RED+"之前的会话已过期，正在重新请求...");
+                    }
                 }
                 try (Response response = manager.POST("mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null))) {
                     JsonBaseResponse<JsonState> state = getState(response);
@@ -116,6 +120,24 @@ public class MainCommand implements CommandExecutor {
                 return true;
             }
         }
+        if(args.length==2) {
+            if(args[0].equals("unbind")) {
+                if(withoutPermission(sender, "hiauth.unbind")) return false;
+                Player player = Bukkit.getServer().getPlayerExact(args[1]);
+                if(player!=null) {
+                    try {
+                        StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), null);
+                        return true;
+                    } catch (Exception e) {
+                        sender.sendMessage(ChatColor.RED+"尝试给%s解绑玩家账号时出现错误！", player.getName());
+                        plugin.error(e, "尝试给%s解绑玩家账号时出现错误！", player.getName());
+                        return false;
+                    }
+                }
+                sender.sendMessage("无法找到玩家%s！", args[1]);
+                return false;
+            }
+        }
         sender.sendMessage(ChatColor.RED+"命令格式错误！");
         return false;
     }
@@ -140,5 +162,23 @@ public class MainCommand implements CommandExecutor {
             map.put("state", state);
         }
         return map;
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        List<String> res = new ArrayList<>();
+        if(args.length == 1 && sender.hasPermission("hiauth.use")) {
+            if(sender.hasPermission("hiauth.reload")) {
+                res.add("reload");
+            }
+            if(sender.hasPermission("hiauth.bind")) {
+                res.add("bind");
+            }
+            if(sender.hasPermission("hiauth.unbind")) {
+                res.add("unbind");
+            }
+        }
+        return res;
     }
 }

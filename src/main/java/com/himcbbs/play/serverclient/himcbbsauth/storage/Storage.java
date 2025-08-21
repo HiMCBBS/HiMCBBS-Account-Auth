@@ -19,8 +19,9 @@ public interface Storage {
     /**
      * Set the user_id by player {@link UUID}
      * @throws Exception if there is something wrong while setting user_id
+     * @implNote if userId is null, remove this mapping from UUID to userId.
      */
-    void setUserId(UUID uuid, String userId) throws Exception;
+    void setUserId(UUID uuid, @Nullable String userId) throws Exception;
 
     /**
      * Initialize the storage.
