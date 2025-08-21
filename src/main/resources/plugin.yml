@@ -7,8 +7,8 @@ prefix: HiMCBBS Account Auth
 authors: [ Terry_MC ]
 description: HiMCBBS Account Auth
 website: https://terry-mc.top/
-#libraries:
-#  - "com.squareup.okhttp3:okhttp:4.12.0"
+libraries:
+  - "com.squareup.okhttp3:okhttp:4.12.0"
 #  - "com.zaxxer:HikariCP:7.0.1"
 #  - "com.mysql:mysql-connector-j:9.4.0"
 #  - "org.mariadb.jdbc:mariadb-java-client:3.5.5"
