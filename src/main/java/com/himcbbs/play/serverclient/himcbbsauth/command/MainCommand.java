@@ -56,14 +56,14 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         HiMCBBSAccountAuth plugin = HiMCBBSAccountAuth.getInstance();
         if(args.length==1) {
             if (args[0].equals("reload")) {
-                if(withoutPermission(sender, "hiauth.reload")) return false;
+                if(withoutPermission(sender, "himcauth.reload")) return false;
                 plugin.disable();
                 plugin.enable();
                 sender.sendMessage(ChatColor.GREEN + "插件已重载。");
                 return true;
             }
             if (args[0].equals("bind")) {
-                if(withoutPermission(sender, "hiauth.bind")) return false;
+                if(withoutPermission(sender, "himcauth.bind")) return false;
                 if(!(sender instanceof Player)) {
                     sender.sendMessage(ChatColor.RED+"该命令无法在控制台中使用！");
                     return true;
@@ -120,10 +120,10 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                     component2.setBold(true);
                     component2.setUnderlined(true);
                     component2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此检测授权")));
-                    component2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hiauth bind"));
+                    component2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/himcauth bind"));
                     player.spigot().sendMessage(component2);
                 } catch (IOException | RuntimeException e) {
-                    player.sendMessage(ChatColor.RED+"绑定账号时出现错误，请手动重新输入/hiauth bind指令重新绑定！");
+                    player.sendMessage(ChatColor.RED+"绑定账号时出现错误，请手动重新输入/himcauth bind指令重新绑定！");
                     plugin.error(e, "尝试给%s绑定玩家账号时出现错误！", player.getName());
                 }
                 return true;
@@ -131,7 +131,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         }
         if(args.length==2) {
             if(args[0].equals("unbind")) {
-                if(withoutPermission(sender, "hiauth.unbind")) return true;
+                if(withoutPermission(sender, "himcauth.unbind")) return true;
                 OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);
                 if(player.hasPlayedBefore()) {
                     try {
@@ -178,17 +178,17 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         List<String> res = new ArrayList<>();
         if(args.length == 1) {
-            if(sender.hasPermission("hiauth.reload")) {
+            if(sender.hasPermission("himcauth.reload")) {
                 res.add("reload");
             }
-            if(sender.hasPermission("hiauth.bind")) {
+            if(sender.hasPermission("himcauth.bind")) {
                 res.add("bind");
             }
-            if(sender.hasPermission("hiauth.unbind")) {
+            if(sender.hasPermission("himcauth.unbind")) {
                 res.add("unbind");
             }
         }
-        if(args.length == 2 && sender.hasPermission("hiauth.unbind") && args[0].equals("unbind")) {
+        if(args.length == 2 && sender.hasPermission("himcauth.unbind") && args[0].equals("unbind")) {
             return Arrays.stream(sender.getServer().getOfflinePlayers()).map((OfflinePlayer::getName)).collect(Collectors.toList());
         }
         return res;

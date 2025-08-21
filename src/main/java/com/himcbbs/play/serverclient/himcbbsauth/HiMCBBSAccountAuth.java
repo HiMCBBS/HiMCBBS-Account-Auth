@@ -45,8 +45,8 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
         reloadConfig();
         try {
             MainCommand command = new MainCommand();
-            getCommand("himcbbsaccountauth").setExecutor(command);
-            getCommand("himcbbsaccountauth").setTabCompleter(command);
+            getCommand("himcauth").setExecutor(command);
+            getCommand("himcauth").setTabCompleter(command);
         } catch (RuntimeException | IOException e) {
             error(e, "当初始化HiMCBBS接入配置时出现问题！");
             disable();

@@ -39,7 +39,7 @@ public class PlayerListener implements Listener {
             component1.setUnderlined(true);
             component1.setColor(ChatColor.GREEN);
             component1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此绑定HiMCBBS账号")));
-            component1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hiauth bind"));
+            component1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/himcauth bind"));
             component.addExtra(component1);
             component.addExtra("来绑定你的HiMCBBS账号以登录");
             player.spigot().sendMessage(component);

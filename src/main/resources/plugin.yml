@@ -13,7 +13,7 @@ libraries:
 #  - "com.mysql:mysql-connector-j:9.4.0"
 #  - "org.mariadb.jdbc:mariadb-java-client:3.5.5"
 commands:
-  himcbbsaccountauth:
+  himcauth:
     description: The main command of HiMCBBS Account Auth.
     usage: "/<command> reload - 重载插件
 /<command> bind - 绑定HiMCBBS账号
