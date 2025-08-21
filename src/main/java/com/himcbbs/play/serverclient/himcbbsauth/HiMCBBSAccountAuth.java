@@ -2,6 +2,7 @@ package com.himcbbs.play.serverclient.himcbbsauth;
 
 import com.himcbbs.play.serverclient.himcbbsauth.command.MainCommand;
 import com.himcbbs.play.serverclient.himcbbsauth.listener.PlayerListener;
+import com.himcbbs.play.serverclient.himcbbsauth.listener.RegisterListener;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.Storage;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.StorageManager;
 import org.bukkit.Bukkit;
@@ -21,10 +22,11 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
     public void onEnable() {
         INSTANCE = this;
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        this.saveDefaultConfig();
-        this.reloadConfig();
+        getServer().getPluginManager().registerEvents(new RegisterListener(), this);
+        saveDefaultConfig();
+        reloadConfig();
         try {
-            this.getCommand("himcbbsaccountauth").setExecutor(new MainCommand());
+            getCommand("himcbbsaccountauth").setExecutor(new MainCommand());
         } catch (RuntimeException | IOException e) {
             error(e, "当初始化HiMCBBS接入配置时出现问题！");
             disable();

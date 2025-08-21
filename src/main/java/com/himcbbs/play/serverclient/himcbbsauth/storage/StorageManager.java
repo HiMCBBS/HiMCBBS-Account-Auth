@@ -1,16 +1,21 @@
 package com.himcbbs.play.serverclient.himcbbsauth.storage;
 
 import com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth;
+import com.himcbbs.play.serverclient.himcbbsauth.event.RegisterStorageModeEvent;
+import org.bukkit.Bukkit;
 
-import java.util.ServiceLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StorageManager {
     private Storage runningStorage;
     private static StorageManager INSTANCE;
+
     public void init() throws Exception {
-        ServiceLoader<Storage> storages = ServiceLoader.load(Storage.class);
-        //TODO: fix the broken SPI
         String storageMode = HiMCBBSAccountAuth.getInstance().getConfig().getString("storage-mode");
+        List<Storage> storages = new ArrayList<>();
+        RegisterStorageModeEvent event = new RegisterStorageModeEvent(storages::add);
+        Bukkit.getServer().getPluginManager().callEvent(event);
         //TODO: make a way to migrate storage mode
         for(Storage storage:storages) {
             if(storage.id().equals(storageMode)) {
