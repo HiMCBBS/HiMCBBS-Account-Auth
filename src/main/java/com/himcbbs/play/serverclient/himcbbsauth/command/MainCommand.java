@@ -138,7 +138,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                         StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), null);
                         sender.sendMessage(ChatColor.GREEN+"解绑成功！");
                     } catch (Exception e) {
-                        sender.sendMessage(ChatColor.RED+"尝试给%s解绑玩家账号时出现错误！", player.getName());
+                        sender.sendMessage(ChatColor.RED+"尝试给" + player.getName() + "解绑玩家账号时出现错误！");
                         plugin.error(e, "尝试给%s解绑玩家账号时出现错误！", player.getName());
                     }
                     return true;

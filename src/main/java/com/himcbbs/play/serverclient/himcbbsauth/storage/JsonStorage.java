@@ -51,6 +51,9 @@ public class JsonStorage implements Storage {
             file = new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
         map = gson.fromJson(file, new TypeToken<HashMap<String,String>>(){}.getType());
+        if(map==null) {
+            map = new HashMap<>();
+        }
     }
 
     @Override

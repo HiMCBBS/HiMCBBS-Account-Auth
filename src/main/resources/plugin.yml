@@ -15,7 +15,7 @@ libraries:
 commands:
   himcauth:
     description: The main command of HiMCBBS Account Auth.
-    usage: "/<command> reload - 重载插件
-/<command> bind - 绑定HiMCBBS账号
+    usage: "/<command> reload - 重载插件\n
+/<command> bind - 绑定HiMCBBS账号\n
 /<command> unbind [玩家名称] - 解除该玩家的HiMCBBS账号绑定"
     aliases: ["hiauth"]
