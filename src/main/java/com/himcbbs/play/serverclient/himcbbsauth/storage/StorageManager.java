@@ -2,6 +2,7 @@ package com.himcbbs.play.serverclient.himcbbsauth.storage;
 
 import com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth;
 import com.himcbbs.play.serverclient.himcbbsauth.event.RegisterStorageModeEvent;
+import com.himcbbs.play.serverclient.himcbbsauth.hook.HookManager;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ public class StorageManager {
         List<Storage> storages = new ArrayList<>();
         RegisterStorageModeEvent event = new RegisterStorageModeEvent(storages::add);
         Bukkit.getServer().getPluginManager().callEvent(event);
-        //TODO: make a way to migrate storage mode
         for(Storage storage:storages) {
             if(storage.id().equals(storageMode)) {
                 runningStorage=storage;
@@ -24,16 +24,18 @@ public class StorageManager {
             }
         }
         if(runningStorage==null) {
-            throw new RuntimeException("错误的存储配置：“"+storageMode+"”");
+            throw new RuntimeException("错误的存储配置：“"+storageMode+"”！");
         }
         runningStorage.init();
     }
+
     public static StorageManager getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new StorageManager();
         }
         return INSTANCE;
     }
+
     public Storage getRunningStorage() {
         return runningStorage;
     }

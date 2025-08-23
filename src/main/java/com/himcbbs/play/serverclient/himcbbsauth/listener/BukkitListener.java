@@ -1,6 +1,7 @@
 package com.himcbbs.play.serverclient.himcbbsauth.listener;
 
 import com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth;
+import com.himcbbs.play.serverclient.himcbbsauth.hook.HookManager;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.Storage;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.StorageManager;
 import net.md_5.bungee.api.ChatColor;
@@ -9,17 +10,22 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.function.Consumer;
 
-public class PlayerListener implements Listener {
+public class BukkitListener implements Listener {
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -28,7 +34,7 @@ public class PlayerListener implements Listener {
             Storage storage = StorageManager.getInstance().getRunningStorage();
             try {
                 if(storage.getUserId(player.getUniqueId())!=null) {
-                    //TODO: force register/login player in the login plugin
+                    HookManager.getInstance().forceLogin(player);
                     return;
                 }
             } catch (Exception ignored) {
@@ -62,5 +68,20 @@ public class PlayerListener implements Listener {
         }
         player.getServer().getScheduler().runTaskLater(plugin, runnable, 20);
         // delay 20 ticks for auth plugins and FastLogin
+    }
+
+    @EventHandler
+    public void onPluginEnable(PluginEnableEvent event) {
+        HookManager.getInstance().initHookByName(event.getPlugin().getName());
+    }
+
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent event) {
+        HookManager.getInstance().initHookByName(event.getPlugin().getName());
+    }
+
+    @EventHandler
+    public void onServerLoadFinish(ServerLoadEvent event) {
+        HookManager.getInstance().checkPluginHook();
     }
 }

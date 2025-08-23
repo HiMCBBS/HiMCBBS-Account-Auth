@@ -19,3 +19,13 @@ commands:
 /<command> bind - 绑定HiMCBBS账号\n
 /<command> unbind [玩家名称] - 解除该玩家的HiMCBBS账号绑定"
     aliases: ["hiauth"]
+permissions:
+  himcauth.bind:
+    description: Permission to bind HiMCBBS account.
+    default: true
+  himcauth.unbind:
+    description: Permission to unbind HiMCBBS account.
+    default: op
+  himcauth.reload:
+    description: Permission to reload this plugin.
+    default: op

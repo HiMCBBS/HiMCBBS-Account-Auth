@@ -3,6 +3,7 @@ package com.himcbbs.play.serverclient.himcbbsauth.command;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth;
+import com.himcbbs.play.serverclient.himcbbsauth.hook.HookManager;
 import com.himcbbs.play.serverclient.himcbbsauth.network.JsonBaseResponse;
 import com.himcbbs.play.serverclient.himcbbsauth.network.JsonState;
 import com.himcbbs.play.serverclient.himcbbsauth.network.JsonUser;
@@ -88,7 +89,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                             StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), String.valueOf(user.data.user_id));
                             player.sendMessage(ChatColor.GREEN+"绑定成功！");
                             stateMap.remove(player.getUniqueId());
-                            //TODO: force register/login player in the login plugin
+                            HookManager.getInstance().forceLogin(player);
                             return true;
                         } catch (Exception e) {
                             player.sendMessage(ChatColor.RED+"绑定账号时出现错误，正在重新请求...");

@@ -1,8 +1,9 @@
 package com.himcbbs.play.serverclient.himcbbsauth;
 
 import com.himcbbs.play.serverclient.himcbbsauth.command.MainCommand;
-import com.himcbbs.play.serverclient.himcbbsauth.listener.PlayerListener;
-import com.himcbbs.play.serverclient.himcbbsauth.listener.RegisterListener;
+import com.himcbbs.play.serverclient.himcbbsauth.hook.HookManager;
+import com.himcbbs.play.serverclient.himcbbsauth.listener.BukkitListener;
+import com.himcbbs.play.serverclient.himcbbsauth.listener.PluginListener;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.Storage;
 import com.himcbbs.play.serverclient.himcbbsauth.storage.StorageManager;
 import org.bukkit.Bukkit;
@@ -39,12 +40,12 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
             foliaSuppported = true;
         } catch (NoSuchMethodException | ClassNotFoundException ignored) {
         }
-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        getServer().getPluginManager().registerEvents(new RegisterListener(), this);
+        getServer().getPluginManager().registerEvents(new BukkitListener(), this);
+        getServer().getPluginManager().registerEvents(new PluginListener(), this);
         saveDefaultConfig();
         reloadConfig();
         try {
-            MainCommand command = new MainCommand();
+            MainCommand command = new MainCommand();//接入配置
             getCommand("himcauth").setExecutor(command);
             getCommand("himcauth").setTabCompleter(command);
         } catch (RuntimeException | IOException e) {
@@ -53,12 +54,13 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
             return;
         }
         try {
-            StorageManager.getInstance().init();
+            StorageManager.getInstance().init();//存储配置
         } catch (Exception e) {
             error(e, "当初始化存储配置时出现问题！");
             disable();
             return;
         }
+        HookManager.getInstance().init();//插件钩子
         info("HiMCBBS Account Auth 已启用");
     }
 
