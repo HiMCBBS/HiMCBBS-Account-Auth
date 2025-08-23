@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 /**
  * An interface to hook into auth plugins.
  * @author Terry_MC
+ * @implNote If your implementation also implement {@link org.bukkit.event.Listener}, it will be automatically registered.
  */
 public interface Hook {
     /**
@@ -13,6 +14,22 @@ public interface Hook {
      * @throws Exception if there is something wrong while force logging in.
      */
     void forceLogin(Player player) throws Exception;
+
+    /**
+     * Force register a player.
+     * @param player the player to force register.
+     * @throws Exception if there is something wrong while force registering.
+     * @implNote The player must be logged in after calling this method.
+     */
+    void forceRegister(Player player, String password) throws Exception;
+
+    /**
+     * Get whether the player is registered.
+     * @param player the player to get.
+     * @return whether the player is registered.
+     * @throws Exception if there is something wrong while getting.
+     */
+    boolean isRegistered(Player player) throws Exception;
 
     /**
      * Initialize your plugin hook.
@@ -27,12 +44,6 @@ public interface Hook {
      * @implNote This method is called when the plugin is disabled.
      */
     void removeHook() throws Exception;
-
-    /**
-     * Get the activation state of your plugin hook.
-     * @return whether your plugin hook is active.
-     */
-    boolean isActive();
 
     /**
      * Get the name of the plugin that you hooked into.

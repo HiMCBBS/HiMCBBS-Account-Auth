@@ -10,7 +10,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -60,14 +59,14 @@ public class BukkitListener implements Listener {
                     }
                     return method.invoke(proxy, args);
                 }));
-                plugin.runDelayed.invoke(scheduler, plugin, consumer, 20);
+                plugin.runDelayed.invoke(scheduler, plugin, consumer, 10);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
             return;
         }
-        player.getServer().getScheduler().runTaskLater(plugin, runnable, 20);
-        // delay 20 ticks for auth plugins and FastLogin
+        player.getServer().getScheduler().runTaskLater(plugin, runnable, 10);
+        // delay 10 ticks for auth plugins
     }
 
     @EventHandler
@@ -77,7 +76,10 @@ public class BukkitListener implements Listener {
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
-        HookManager.getInstance().initHookByName(event.getPlugin().getName());
+        if(event.getPlugin().getName().equals(HookManager.getInstance().getRunningHookName())) {
+            HookManager.getInstance().disableHook();
+            HiMCBBSAccountAuth.getInstance().warn("移除了登录插件的接入接口！这应该仅在关闭服务端或重载登录插件时出现！");
+        }
     }
 
     @EventHandler
