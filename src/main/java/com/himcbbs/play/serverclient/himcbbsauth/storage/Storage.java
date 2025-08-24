@@ -1,13 +1,15 @@
 package com.himcbbs.play.serverclient.himcbbsauth.storage;
 
 import org.jetbrains.annotations.Nullable;
+
+import java.io.Closeable;
 import java.util.UUID;
 
 /**
  * An interface to store mappings from player {@link UUID} to user_id.
  * @author Terry_MC
  */
-public interface Storage {
+public interface Storage extends AutoCloseable {
     /**
      * Get the user_id by player {@link UUID}.
      * @param uuid the player's {@link UUID}.

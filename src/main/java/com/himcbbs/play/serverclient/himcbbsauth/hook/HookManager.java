@@ -33,6 +33,7 @@ public class HookManager {
                     runningHook = hook;
                     if(runningHook instanceof Listener) {
                         plugin.getServer().getPluginManager().registerEvents((Listener) runningHook, plugin);
+                        plugin.info("已注册接入接口“%s”的监听器！", hook.name());
                     }
                     plugin.info("已接入登录插件“%s”！", hook.name());
                 } catch (Exception e) {

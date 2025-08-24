@@ -66,6 +66,11 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        try {
+            StorageManager.getInstance().disable();
+        } catch (Exception e) {
+            error(e, "禁用存储配置时出现问题！");
+        }
         info("HiMCBBS Account Auth 已禁用");
     }
 

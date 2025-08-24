@@ -2,7 +2,6 @@ package com.himcbbs.play.serverclient.himcbbsauth.storage;
 
 import com.himcbbs.play.serverclient.himcbbsauth.HiMCBBSAccountAuth;
 import com.himcbbs.play.serverclient.himcbbsauth.event.RegisterStorageModeEvent;
-import com.himcbbs.play.serverclient.himcbbsauth.hook.HookManager;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -27,6 +26,12 @@ public class StorageManager {
             throw new RuntimeException("错误的存储配置：“"+storageMode+"”！");
         }
         runningStorage.init();
+    }
+
+    public void disable() throws Exception {
+        if(runningStorage!=null) {
+            runningStorage.close();
+        }
     }
 
     public static StorageManager getInstance() {

@@ -63,4 +63,8 @@ public class JsonStorage implements Storage {
 
     public JsonStorage() {
     }
+
+    @Override
+    public void close() {
+    }
 }

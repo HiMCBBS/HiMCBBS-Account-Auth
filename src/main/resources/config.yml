@@ -3,8 +3,39 @@
 # 存储配置
 
 # 此项决定如何存储玩家数据
-# 可用的存储选项：json
-storage-mode: json
+# 可用的存储选项：json、sqlite、mysql、mariadb
+storage-mode: sqlite
+
+# SQLite 配置（当storage-mode为sqlite时生效）
+sqlite:
+  # SQLite 数据库文件名
+  file: "sqlite.db"
+  # 表名
+  table: "himcauth"
+
+# MySQL 配置（当storage-mode为mysql时生效）
+mysql:
+  host: "localhost"
+  port: 3306
+  database: "himcauth"
+  username: "root"
+  password: "password"
+  table: "himcauth"
+  # 连接池配置
+  pool-size: 10
+  connection-timeout: 30000
+
+# MariaDB 配置（当storage-mode为mariadb时生效）
+mariadb:
+  host: "localhost"
+  port: 3306
+  database: "himcauth"
+  username: "root"
+  password: "password"
+  table: "himcauth"
+  # 连接池配置
+  pool-size: 10
+  connection-timeout: 30000
 
 # HiMCBBS接入配置
 
