@@ -75,7 +75,7 @@ public class HookManager {
     }
 
     public String getRunningHookName() {
-        return runningHook.name();
+        return runningHook!=null?runningHook.name():null;
     }
 
     public static HookManager getInstance() {
