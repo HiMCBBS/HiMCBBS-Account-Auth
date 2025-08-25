@@ -16,7 +16,7 @@ public class StorageManager {
         HiMCBBSAccountAuth plugin = HiMCBBSAccountAuth.getInstance();
         String storageMode = plugin.getConfig().getString("storage-mode");
         String lastStorageMode = plugin.getConfig().getString("previous-storage-mode", storageMode);
-        if(lastStorageMode.equals(storageMode)) {
+        if (lastStorageMode != null && lastStorageMode.equals(storageMode)) {
             lastStorageMode = null;
         }
         List<Storage> storages = new ArrayList<>();
@@ -46,7 +46,7 @@ public class StorageManager {
                 for(Map.Entry<UUID, String> entry:oldData.entrySet()) {
                     runningStorage.setUserId(entry.getKey(), entry.getValue());
                     cnt++;
-                    int now = cnt / total;
+                    int now = (int) (1F * cnt / total * 100);
                     if(now-progress>=5) {
                         progress = now;
                         plugin.info("迁移进度：%d%%", progress);

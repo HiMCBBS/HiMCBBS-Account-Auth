@@ -6,6 +6,10 @@
 # 可用的存储选项：json、sqlite、mysql、mariadb
 storage-mode: sqlite
 
+# 此项存储上次使用的存储配置，用于数据迁移
+# 此项配置值为插件自动切换，请勿改变此项配置值！
+previous-storage-mode: sqlite
+
 # SQLite 配置（当storage-mode为sqlite时生效）
 sqlite:
   # SQLite 数据库文件名
