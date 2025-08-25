@@ -7,6 +7,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -116,6 +119,31 @@ public abstract class DatabaseStorage implements Storage {
     public void init() throws Exception {
         // 创建线程池用于异步数据库操作
         executorService = Executors.newFixedThreadPool(5);
+    }
+
+    @Override
+    public Map<UUID, String> getAllMappings() throws Exception {
+        CompletableFuture<Map<UUID, String>> future = new CompletableFuture<>();
+
+        executorService.submit(() -> {
+            Map<UUID, String> result = new HashMap<>();
+            try (Connection connection = dataSource.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(
+                         "SELECT uuid, user_id FROM " + tableName);
+                 ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String uuidStr = resultSet.getString("uuid");
+                    String userId = resultSet.getString("user_id");
+                    result.put(UUID.fromString(uuidStr), userId);
+                }
+                future.complete(Collections.unmodifiableMap(result));
+            } catch (SQLException e) {
+                future.completeExceptionally(e);
+            }
+        });
+
+        return future.get();
     }
 
     @Override

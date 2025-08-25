@@ -12,7 +12,7 @@ public class MariaDBStorage extends DatabaseStorage {
         super.init();
         ConfigurationSection config = HiMCBBSAccountAuth.getInstance().getConfig().getConfigurationSection("mariadb");
         if (config == null) {
-            throw new RuntimeException("MariaDB配置缺失");
+            throw new RuntimeException("MariaDB配置缺失！");
         }
         String host = config.getString("host", "localhost");
         int port = config.getInt("port", 3306);

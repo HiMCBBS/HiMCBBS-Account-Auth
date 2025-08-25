@@ -45,7 +45,7 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
         try {
-            MainCommand command = new MainCommand();//接入配置
+            MainCommand command = new MainCommand();//接入配置（我写在MainCommand构造函数里了）
             getCommand("himcauth").setExecutor(command);
             getCommand("himcauth").setTabCompleter(command);
         } catch (RuntimeException | IOException e) {

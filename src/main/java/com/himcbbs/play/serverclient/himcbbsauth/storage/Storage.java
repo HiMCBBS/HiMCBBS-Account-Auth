@@ -2,7 +2,7 @@ package com.himcbbs.play.serverclient.himcbbsauth.storage;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.io.Closeable;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -28,6 +28,14 @@ public interface Storage extends AutoCloseable {
      * @implNote If userId is null, remove this mapping from UUID to userId.
      */
     void setUserId(UUID uuid, @Nullable String userId) throws Exception;
+
+    /**
+     * Get all user_id mappings.
+     * @return a map containing all UUID to user_id mappings.
+     * @throws Exception if there is something wrong while getting all mappings.
+     * @implNote This method is only used for migrating {@link Storage} instance, so it is best to return an unmodifiable {@link Map}.
+     */
+    Map<UUID, String> getAllMappings() throws Exception;
 
     /**
      * Initialize the storage.

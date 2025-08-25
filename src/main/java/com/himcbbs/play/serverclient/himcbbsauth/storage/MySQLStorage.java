@@ -12,7 +12,7 @@ public class MySQLStorage extends DatabaseStorage {
         super.init();
         ConfigurationSection config = HiMCBBSAccountAuth.getInstance().getConfig().getConfigurationSection("mysql");
         if (config == null) {
-            throw new RuntimeException("MySQL配置缺失");
+            throw new RuntimeException("MySQL配置缺失！");
         }
         String host = config.getString("host", "localhost");
         int port = config.getInt("port", 3306);

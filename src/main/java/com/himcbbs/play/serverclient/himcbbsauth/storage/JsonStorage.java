@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -61,7 +62,13 @@ public class JsonStorage implements Storage {
         return "json";
     }
 
-    public JsonStorage() {
+    @Override
+    public Map<UUID, String> getAllMappings() {
+        Map<UUID, String> result = new HashMap<>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            result.put(UUID.fromString(entry.getKey()), entry.getValue());
+        }
+        return Collections.unmodifiableMap(result);
     }
 
     @Override

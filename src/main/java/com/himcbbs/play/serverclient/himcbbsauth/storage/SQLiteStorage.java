@@ -20,7 +20,6 @@ public class SQLiteStorage extends DatabaseStorage {
         tableName = config.getString("table", "himcauth");
         HikariConfig hikariConfig = new HikariConfig();
         File dbFile = HiMCBBSAccountAuth.getInstance().getStoragePath(this).resolve(fileName).toFile();
-        dbFile.getParentFile().mkdirs();
         hikariConfig.setJdbcUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
         hikariConfig.setDriverClassName("org.sqlite.JDBC");
         hikariConfig.setMaximumPoolSize(5);
