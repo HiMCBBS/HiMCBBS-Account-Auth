@@ -7,7 +7,7 @@
 - 简单易懂的配置文件。
 - Java 11及以上版本支持。
 ## 安装
-1. 打开[Jenkins CI](https://ci.hiworldmc.com/job/HiMCBBS/job/HiMCBBS%20Account%20Auth/)界面下载最新构建版插件。
+1. 打开[Jenkins CI](https://ci.hiworldmc.com/job/HiMCBBS/job/HiMCBBS-Account-Auth/)界面下载最新构建版插件。
 2. 将下载的插件放入服务器的`plugins`文件夹中。
 3. 重启服务器。
 4. 在`plugins/HiMCBBS-Account-Auth`目录下找到`config.yml`文件，按照注释进行数据库信息等配置。
