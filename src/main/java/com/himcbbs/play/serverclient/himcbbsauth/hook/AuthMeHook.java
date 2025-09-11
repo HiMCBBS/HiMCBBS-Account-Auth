@@ -13,7 +13,6 @@ import org.bukkit.event.Listener;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class AuthMeHook implements Hook, Listener {
@@ -44,19 +43,24 @@ public class AuthMeHook implements Hook, Listener {
         }
     }
 
+    private boolean commandAdded = false;
+
     @Override
     public void initializeHook() {
         api = AuthMeApi.getInstance();
-        try {
-            Field field = api.getPlugin().getClass().getDeclaredField("settings");
-            field.setAccessible(true);
-            Settings settings = (Settings) field.get(api.getPlugin());
-            Set<String> defaults = new HashSet<>(settings.getProperty(RestrictionSettings.ALLOW_COMMANDS));
-            defaults.add("/himcauth");
-            defaults.add("/hiauth");
-            settings.setProperty(RestrictionSettings.ALLOW_COMMANDS, defaults);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            HiMCBBSAccountAuth.getInstance().warn("[AuthMe插件接入] 无法自动添加命令例外，请手动添加！");
+        if(!commandAdded) {
+            commandAdded = true;
+            try {
+                Field field = api.getPlugin().getClass().getDeclaredField("settings");
+                field.setAccessible(true);
+                Settings settings = (Settings) field.get(api.getPlugin());
+                Set<String> defaults = new HashSet<>(settings.getProperty(RestrictionSettings.ALLOW_COMMANDS));
+                defaults.add("/himcauth");
+                defaults.add("/hiauth");
+                settings.setProperty(RestrictionSettings.ALLOW_COMMANDS, defaults);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                HiMCBBSAccountAuth.getInstance().warn("[AuthMe插件接入] 无法自动添加命令例外，请手动添加！");
+            }
         }
         //TODO: no annoying tips
     }

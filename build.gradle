@@ -25,6 +25,7 @@ dependencies {
     compileOnly("ch.jalu:configme:1.3.1") {
         exclude(module: "snakeyaml")
     }
+//    compileOnly "ch.jalu:injector:1.0"
     compileOnly "com.zaxxer:HikariCP:7.0.1"
     compileOnly "com.mysql:mysql-connector-j:9.4.0"
     compileOnly "org.mariadb.jdbc:mariadb-java-client:3.5.5"
