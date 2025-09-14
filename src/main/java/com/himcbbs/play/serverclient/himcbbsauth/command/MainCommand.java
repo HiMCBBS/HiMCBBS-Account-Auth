@@ -87,9 +87,9 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                                 throw new RuntimeException("授权失败！状态码："+user.status+" 消息："+user.message);
                             }
                             StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), String.valueOf(user.data.user_id));
-                            player.sendMessage(ChatColor.GREEN+"绑定成功！");
                             stateMap.remove(player.getUniqueId());
                             HookManager.getInstance().forceLogin(player);
+                            player.sendMessage(ChatColor.GREEN+"绑定成功！");
                             return true;
                         } catch (Exception e) {
                             player.sendMessage(ChatColor.RED+"绑定账号时出现错误，正在重新请求...");

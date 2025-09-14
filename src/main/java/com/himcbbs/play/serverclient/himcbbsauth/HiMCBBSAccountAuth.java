@@ -71,6 +71,8 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
         } catch (Exception e) {
             error(e, "禁用存储配置时出现问题！");
         }
+        getCommand("himcauth").setExecutor(null);
+        getCommand("himcauth").setTabCompleter(null);
         info("HiMCBBS Account Auth 已禁用");
     }
 
