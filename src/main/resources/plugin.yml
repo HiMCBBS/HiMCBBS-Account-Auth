@@ -13,7 +13,7 @@ libraries:
   - "com.mysql:mysql-connector-j:9.4.0"
   - "org.mariadb.jdbc:mariadb-java-client:3.5.5"
   - "org.xerial:sqlite-jdbc:3.50.3.0"
-softdepend:
+loadbefore:
   - AuthMe
 commands:
   himcauth:
