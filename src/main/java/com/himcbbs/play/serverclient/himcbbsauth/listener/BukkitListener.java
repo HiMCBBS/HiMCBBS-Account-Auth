@@ -33,7 +33,16 @@ public class BukkitListener implements Listener {
             Storage storage = StorageManager.getInstance().getRunningStorage();
             try {
                 if(storage.getUserId(player.getUniqueId())!=null) {
-                    HookManager.getInstance().forceLogin(player);
+                    BaseComponent component = new TextComponent("你可以");
+                    BaseComponent component1 = new TextComponent("[点击这里]");
+                    component1.setBold(true);
+                    component1.setUnderlined(true);
+                    component1.setColor(ChatColor.GREEN);
+                    component1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此登录HiMCBBS账号")));
+                    component1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/himcauth login"));
+                    component.addExtra(component1);
+                    component.addExtra("来登录你的HiMCBBS账号");
+                    player.spigot().sendMessage(component);
                     return;
                 }
             } catch (Exception ignored) {

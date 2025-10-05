@@ -20,7 +20,8 @@ commands:
     description: The main command of HiMCBBS Account Auth.
     usage: "/<command> reload - 重载插件\n
 /<command> bind - 绑定HiMCBBS账号\n
-/<command> unbind [玩家名称] - 解除该玩家的HiMCBBS账号绑定"
+/<command> unbind [玩家名称] - 解除该玩家的HiMCBBS账号绑定
+/<command> login - 使用HiMCBBS账号登录"
     aliases: ["hiauth"]
 permissions:
   himcauth.bind:
@@ -32,3 +33,6 @@ permissions:
   himcauth.reload:
     description: Permission to reload this plugin.
     default: op
+  himcauth.login:
+    description: Permission to login with HiMCBBS account.
+    default: true

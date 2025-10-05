@@ -13,10 +13,12 @@
 4. 在`plugins/HiMCBBS-Account-Auth`目录下找到`config.yml`文件，按照注释进行数据库信息等配置。
 5. 重启服务器使配置生效。
 ## 命令
+- `/himcauth login` - 登录自己的HiMCBBS账号。
 - `/himcauth bind` - 绑定自己的HiMCBBS账号。
 - `/himcauth unbind <玩家名称>` - 解绑对应玩家名称的HiMCBBS账号。
 - `/himcauth reload` - 热重载插件配置文件。
 ## 权限
+- `himcauth.login` - 登录自己HiMCBBS账号的权限。
 - `himcauth.bind` - 绑定自己HiMCBBS账号的权限。
 - `himcauth.unbind` - 解绑玩家HiMCBBS账号的权限。
 - `himcauth.reload` - 热重载插件配置文件的权限。

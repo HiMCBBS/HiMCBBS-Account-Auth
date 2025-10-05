@@ -56,78 +56,143 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         HiMCBBSAccountAuth plugin = HiMCBBSAccountAuth.getInstance();
         if(args.length==1) {
-            if (args[0].equals("reload")) {
-                if(withoutPermission(sender, "himcauth.reload")) return false;
-                plugin.disable();
-                plugin.enable();
-                sender.sendMessage(ChatColor.GREEN + "插件已重载。");
-                return true;
-            }
-            if (args[0].equals("bind")) {
-                if(withoutPermission(sender, "himcauth.bind")) return false;
-                if(!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED+"该命令无法在控制台中使用！");
+            switch (args[0]) {
+                case "reload":
+                    if (withoutPermission(sender, "himcauth.reload")) return false;
+                    plugin.disable();
+                    plugin.enable();
+                    sender.sendMessage(ChatColor.GREEN + "插件已重载。");
                     return true;
-                }
-                Player player = (Player) sender;
-                NetworkManager manager = NetworkManager.getInstance();
-                try {
-                    if(StorageManager.getInstance().getRunningStorage().getUserId(player.getUniqueId())!=null) {
-                        sender.sendMessage("你已经绑定过HiMCBBS账号了！");
+                case "bind": {
+                    if (withoutPermission(sender, "himcauth.bind")) return false;
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(ChatColor.RED + "该命令无法在控制台中使用！");
                         return true;
                     }
-                } catch (Exception ignored) {
-                }
-                if(stateMap.get(player.getUniqueId())!=null) {
-                    Map.Entry<Long, JsonState> entry = stateMap.get(player.getUniqueId());
-                    if(entry.getKey()+entry.getValue().expires_in>=Instant.now().getEpochSecond()) {
-                        try (Response response = manager.POST("mcserver_client/getMCServerOAuthResult", getRequestBody(entry.getValue().state))) {
-                            JsonBaseResponse<JsonUser> user = manager.getObjectByResponse(response, new TypeToken<JsonBaseResponse<JsonUser>>(){});
-                            if(!response.isSuccessful()) {
-                                throw new RuntimeException("授权失败！状态码："+user.status+" 消息："+user.message);
-                            }
-                            StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), String.valueOf(user.data.user_id));
-                            stateMap.remove(player.getUniqueId());
-                            HookManager.getInstance().forceLogin(player);
-                            player.sendMessage(ChatColor.GREEN+"绑定成功！");
+                    Player player = (Player) sender;
+                    NetworkManager manager = NetworkManager.getInstance();
+                    try {
+                        if (StorageManager.getInstance().getRunningStorage().getUserId(player.getUniqueId()) != null) {
+                            sender.sendMessage("你已经绑定过HiMCBBS账号了！");
                             return true;
-                        } catch (Exception e) {
-                            player.sendMessage(ChatColor.RED+"绑定账号时出现错误，正在重新请求...");
-                            plugin.error(e, "尝试给%s绑定玩家账号时出现错误！", player.getName());
+                        }
+                    } catch (Exception ignored) {
+                    }
+                    if (stateMap.get(player.getUniqueId()) != null) {
+                        Map.Entry<Long, JsonState> entry = stateMap.get(player.getUniqueId());
+                        if (entry.getKey() + entry.getValue().expires_in >= Instant.now().getEpochSecond()) {
+                            try (Response response = manager.POST("mcserver_client/getMCServerOAuthResult", getRequestBody(entry.getValue().state))) {
+                                JsonBaseResponse<JsonUser> user = manager.getObjectByResponse(response, new TypeToken<JsonBaseResponse<JsonUser>>() {
+                                });
+                                if (!response.isSuccessful()) {
+                                    throw new RuntimeException("授权失败！状态码：" + user.status + " 消息：" + user.message);
+                                }
+                                StorageManager.getInstance().getRunningStorage().setUserId(player.getUniqueId(), String.valueOf(user.data.user_id));
+                                stateMap.remove(player.getUniqueId());
+                                HookManager.getInstance().forceLogin(player);
+                                player.sendMessage(ChatColor.GREEN + "绑定成功！");
+                                return true;
+                            } catch (Exception e) {
+                                player.sendMessage(ChatColor.RED + "绑定账号时出现错误，正在重新请求...");
+                                plugin.error(e, "尝试给%s绑定玩家账号时出现错误！", player.getName());
+                            }
+                        } else {
+                            stateMap.remove(player.getUniqueId());
+                            player.sendMessage(ChatColor.RED + "之前的会话已过期，正在重新请求...");
                         }
                     }
-                    else {
-                        stateMap.remove(player.getUniqueId());
-                        player.sendMessage(ChatColor.RED+"之前的会话已过期，正在重新请求...");
+                    try (Response response = manager.POST("mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null))) {
+                        JsonBaseResponse<JsonState> state = getState(response);
+                        if (!response.isSuccessful()) {
+                            throw new RuntimeException("请求出错！状态码：" + state.status + " 消息：" + state.message);
+                        }
+                        stateMap.put(player.getUniqueId(), Map.entry(Instant.now().getEpochSecond(), state.data));
+                        BaseComponent component = new TextComponent("请在" + state.data.expires_in + "秒内");
+                        BaseComponent component1 = getClickComponent(state);
+                        component.addExtra(component1);
+                        component.addExtra(new TextComponent("打开浏览器授权登录HiMCBBS账号"));
+                        player.spigot().sendMessage(component);
+                        BaseComponent component2 = new TextComponent("[完成后请点击此处]");
+                        component2.setBold(true);
+                        component2.setUnderlined(true);
+                        component2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此检测授权")));
+                        component2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/himcauth bind"));
+                        player.spigot().sendMessage(component2);
+                    } catch (IOException | RuntimeException e) {
+                        player.sendMessage(ChatColor.RED + "绑定账号时出现错误，请手动重新输入/himcauth bind指令重新绑定！");
+                        plugin.error(e, "尝试给%s绑定玩家账号时出现错误！", player.getName());
                     }
+                    return true;
                 }
-                try (Response response = manager.POST("mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null))) {
-                    JsonBaseResponse<JsonState> state = getState(response);
-                    if(!response.isSuccessful()) {
-                        throw new RuntimeException("请求出错！状态码："+state.status+" 消息："+state.message);
+                case "login": {
+                    if (withoutPermission(sender, "himcauth.login")) return false;
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(ChatColor.RED + "该命令无法在控制台中使用！");
+                        return true;
                     }
-                    stateMap.put(player.getUniqueId(), Map.entry(Instant.now().getEpochSecond(), state.data));
-                    BaseComponent component = new TextComponent("请在"+state.data.expires_in+"秒内");
-                    BaseComponent component1 = new TextComponent("[点击此处]");
-                    component1.setColor(net.md_5.bungee.api.ChatColor.GREEN);
-                    component1.setBold(true);
-                    component1.setUnderlined(true);
-                    component1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此打开浏览器授权")));
-                    component1.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, String.format(AUTHORIZE_FORMAT_URL, NetworkManager.API_TEST_HOST, NetworkManager.API_TEST_PORT, state.data.state)));
-                    component.addExtra(component1);
-                    component.addExtra(new TextComponent("打开浏览器授权登录HiMCBBS账号"));
-                    player.spigot().sendMessage(component);
-                    BaseComponent component2 = new TextComponent("[完成后请点击此处]");
-                    component2.setBold(true);
-                    component2.setUnderlined(true);
-                    component2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此检测授权")));
-                    component2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/himcauth bind"));
-                    player.spigot().sendMessage(component2);
-                } catch (IOException | RuntimeException e) {
-                    player.sendMessage(ChatColor.RED+"绑定账号时出现错误，请手动重新输入/himcauth bind指令重新绑定！");
-                    plugin.error(e, "尝试给%s绑定玩家账号时出现错误！", player.getName());
+                    Player player = (Player) sender;
+                    String storedUserId;
+                    try {
+                        storedUserId = StorageManager.getInstance().getRunningStorage().getUserId(player.getUniqueId());
+                        if (storedUserId == null) {
+                            sender.sendMessage(ChatColor.RED + "你还没有绑定HiMCBBS账号！使用/himcauth bind来绑定账号！");
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        player.sendMessage("登录账号时出现错误，请手动输入/himcauth login指令重新登录！");
+                        plugin.error(e, "尝试给%s登录玩家账号时出现错误！", player.getName());
+                        return true;
+                    }
+                    NetworkManager manager = NetworkManager.getInstance();
+                    if (stateMap.get(player.getUniqueId()) != null) {
+                        Map.Entry<Long, JsonState> entry = stateMap.get(player.getUniqueId());
+                        if (entry.getKey() + entry.getValue().expires_in >= Instant.now().getEpochSecond()) {
+                            try (Response response = manager.POST("mcserver_client/getMCServerOAuthResult", getRequestBody(entry.getValue().state))) {
+                                JsonBaseResponse<JsonUser> user = manager.getObjectByResponse(response, new TypeToken<JsonBaseResponse<JsonUser>>() {
+                                });
+                                if (!response.isSuccessful()) {
+                                    throw new RuntimeException("授权失败！状态码：" + user.status + " 消息：" + user.message);
+                                }
+                                stateMap.remove(player.getUniqueId());
+                                if (String.valueOf(user.data.user_id).equals(storedUserId)) {
+                                    HookManager.getInstance().forceLogin(player);
+                                    player.sendMessage(ChatColor.GREEN + "登录成功！");
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "你登录的账号与之前绑定的账号不符，请手动输入/himcauth login指令重新登录！");
+                                }
+                                return true;
+                            } catch (Exception e) {
+                                player.sendMessage(ChatColor.RED + "登录账号时出现错误，正在重新请求...");
+                                plugin.error(e, "尝试给%s登录玩家账号时出现错误！", player.getName());
+                            }
+                        } else {
+                            stateMap.remove(player.getUniqueId());
+                            player.sendMessage(ChatColor.RED + "之前的会话已过期，正在重新请求...");
+                        }
+                    }
+                    try (Response response = manager.POST("mcserver_client/startMCServerOAuthLoginSession", getRequestBody(null))) {
+                        JsonBaseResponse<JsonState> state = getState(response);
+                        if (!response.isSuccessful()) {
+                            throw new RuntimeException("请求出错！状态码：" + state.status + " 消息：" + state.message);
+                        }
+                        stateMap.put(player.getUniqueId(), Map.entry(Instant.now().getEpochSecond(), state.data));
+                        BaseComponent component = new TextComponent("请在" + state.data.expires_in + "秒内");
+                        BaseComponent component1 = getClickComponent(state);
+                        component.addExtra(component1);
+                        component.addExtra(new TextComponent("打开浏览器授权登录HiMCBBS账号"));
+                        player.spigot().sendMessage(component);
+                        BaseComponent component2 = new TextComponent("[完成后请点击此处]");
+                        component2.setBold(true);
+                        component2.setUnderlined(true);
+                        component2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此检测授权")));
+                        component2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + label + " login"));
+                        player.spigot().sendMessage(component2);
+                    } catch (IOException | RuntimeException e) {
+                        player.sendMessage(ChatColor.RED + "登录账号时出现错误，请手动输入/" + label + " login指令重新登录！");
+                        plugin.error(e, "尝试给%s登录玩家账号时出现错误！", player.getName());
+                    }
+                    return true;
                 }
-                return true;
             }
         }
         if(args.length==2) {
@@ -150,6 +215,17 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         }
         sender.sendMessage(ChatColor.RED+"命令格式错误！");
         return false;
+    }
+
+    @NotNull
+    private static BaseComponent getClickComponent(JsonBaseResponse<JsonState> state) {
+        BaseComponent component1 = new TextComponent("[点击此处]");
+        component1.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+        component1.setBold(true);
+        component1.setUnderlined(true);
+        component1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("点此打开浏览器授权")));
+        component1.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, String.format(AUTHORIZE_FORMAT_URL, NetworkManager.API_TEST_HOST, NetworkManager.API_TEST_PORT, state.data.state)));
+        return component1;
     }
 
     private boolean withoutPermission(CommandSender sender, String s) {
