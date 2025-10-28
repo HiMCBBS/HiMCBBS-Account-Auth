@@ -27,8 +27,8 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
     public Method getGlobalRegionScheduler = null;
     /** ScheduledTask runDelayed(Plugin plugin, Consumer<ScheduledTask> task, long delayTicks); */
     public Method runDelayed = null;
-    public boolean foliaSuppported = false;
-    //folia end
+    public boolean foliaSupported = false;
+    // folia end
 
     @Override
     public void onEnable() {
@@ -37,7 +37,7 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
             Class<?> clazz = Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
             getGlobalRegionScheduler = Server.class.getMethod("getGlobalRegionScheduler");
             runDelayed = clazz.getMethod("runDelayed", Plugin.class, Consumer.class, long.class);
-            foliaSuppported = true;
+            foliaSupported = true;
         } catch (NoSuchMethodException | ClassNotFoundException ignored) {
         }
         getServer().getPluginManager().registerEvents(new BukkitListener(), this);

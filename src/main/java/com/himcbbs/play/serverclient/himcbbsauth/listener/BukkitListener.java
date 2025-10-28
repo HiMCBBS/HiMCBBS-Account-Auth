@@ -58,7 +58,7 @@ public class BukkitListener implements Listener {
             component.addExtra("来绑定你的HiMCBBS账号以登录");
             player.spigot().sendMessage(component);
         };
-        if(plugin.foliaSuppported) {
+        if(plugin.foliaSupported) {
             try {
                 Object scheduler = plugin.getGlobalRegionScheduler.invoke(player.getServer());
                 Consumer<?> consumer = (Consumer<?>) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Consumer.class}, ((proxy, method, args) -> {
