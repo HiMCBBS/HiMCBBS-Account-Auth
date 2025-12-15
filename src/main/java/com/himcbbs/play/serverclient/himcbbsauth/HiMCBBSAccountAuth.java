@@ -103,6 +103,10 @@ public final class HiMCBBSAccountAuth extends JavaPlugin {
         LOGGER.warning(String.format(log, args));
     }
 
+    public void warn(Throwable throwable, String log, Object... args) {
+        LOGGER.log(Level.WARNING, String.format(log, args), throwable);
+    }
+
     public void error(String log, Object... args) {
         LOGGER.severe(String.format(log, args));
     }
